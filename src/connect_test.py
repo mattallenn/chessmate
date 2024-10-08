@@ -45,9 +45,30 @@ def initialize_printer():
         send_gcode('M105')
 
 # Example function to move the printer
-def move_printer():
-    # Example G-code to move to a specific position
-    send_gcode('G1 X50 Y50 Z10 F3000')  # Move to X=50, Y=50, Z=10 at speed F=3000
+def move_to_corners():
+    # Home the printer
+    send_gcode('G28')
+
+    # Move to Z-height 10mm for safety
+    send_gcode('G1 Z10 F3000')
+
+    # Move to each corner with pauses
+    corners = [
+        ('G1 X0 Y0 F3000', 'Corner 1: Front-left'),
+        ('G1 X220 Y0 F3000', 'Corner 2: Front-right'),
+        ('G1 X220 Y220 F3000', 'Corner 3: Back-right'),
+        ('G1 X0 Y220 F3000', 'Corner 4: Back-left'),
+    ]
+
+    # Repeat moving to corners twice
+    for _ in range(2):  # Adjust the range to repeat more/less
+        for gcode, description in corners:
+            print(description)
+            send_gcode(gcode)
+            send_gcode('G4 P500')  # Pause for 500 milliseconds
+
+    # Return to center
+    send_gcode('G1 X110 Y110 F3000')
 
 # Main program
 if __name__ == '__main__':
@@ -56,7 +77,7 @@ if __name__ == '__main__':
         initialize_printer()
 
         # Move the printer as an example
-        move_printer()
+        move_to_corners()
 
     except Exception as e:
         print(f"Error: {e}")
