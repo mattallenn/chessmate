@@ -14,7 +14,7 @@ class PrinterController:
     def connect(self):
         try:
             # Open the serial connection
-            self.ser = serial.Serial(self.port, self.baudrate, timeout=1)
+            self.ser = serial.Serial(self.port, self.baudrate, timeout=5)
             time.sleep(2)  # Give the connection some time to establish
             print("Connected to printer.")
         except Exception as e:
@@ -24,7 +24,7 @@ class PrinterController:
         if self.ser is not None and self.ser.is_open:
             for cmd in gcode_commands:
                 self.ser.write((cmd + "\n").encode())  # Send G-code command
-                time.sleep(0.5)  # Delay between commands
+                time.sleep(0.1)  # Delay between commands
                 response = self.ser.readline().decode('utf-8')  # Read response
                 print(f"Response: {response.strip()}")
         else:
@@ -72,7 +72,8 @@ try:
         # Define the coordinates of each square on the chessboard
         # TODO: Add the coordinates of all squares. This can be done with a constant distance between squares and a function.
         chessboard_coords = {
-            'e4': (50, 90),
+            'e4': (50, 90), 
+            'e5': (50, 100),
         }
 
         if start_square in chessboard_coords and end_square in chessboard_coords:
