@@ -3,6 +3,7 @@ import time
 
 z_stop = 10 # Height above chess piece to move to when picking up and placing pieces.
 z_upper = 75 # Height to move to when moving between squares
+velocity = 5000 # Movement velocity
 
 class PrinterController:
     def __init__(self, port="/dev/ttyUSB0", baudrate=115200):
@@ -38,17 +39,17 @@ class PrinterController:
 # G-code generator function
 def generate_gcode(start, end):
     gcode = []
-    gcode.append(f"G1 Z75") # Raise Z-axis to avoid hitting the board
-    gcode.append(f"G1 X{start[0]} Y{start[1]} Z75")  # Move above start position
+    gcode.append(f"G1 Z75 {velocity}") # Raise Z-axis to avoid hitting the board
+    gcode.append(f"G1 X{start[0]} Y{start[1]} Z75 {velocity}")  # Move above start position
     # Make sure gripper is open
     gcode.append(f"G1 Z{z_stop}") # Lower it to pick up the piece at z_stop height
     # Add command to close gripper. Move extruder servo to close gripper?
-    gcode.append(f"G1 Z75") # Raise Z-axis to avoid hitting the board
-    gcode.append(f"G1 X{end[0]} Y{end[1]} Z10")  # Move above end position
-    gcode.append("G1 Z0")  # Lower Z-axis to place piece
+    gcode.append(f"G1 Z75 {velocity}") # Raise Z-axis to avoid hitting the board
+    gcode.append(f"G1 X{end[0]} Y{end[1]} Z10 {velocity}")  # Move above end position
+    gcode.append(f"G1 Z10 {velocity}")  # Lower Z-axis to place piece
     # Open gripper
-    gcode.append(f"G1 Z75") # Raise Z-axis to avoid hitting the board
-    gcode.append(f"G1 X0 Y0 Z75") # Move gripper to home position (back left corner of the board)
+    gcode.append(f"G1 Z75 {velocity}") # Raise Z-axis to avoid hitting the board
+    gcode.append(f"G1 X0 Y0 Z75 {velocity}") # Move gripper to home position (back left corner of the board)
     return gcode
 
 # Initialize the printer controller
