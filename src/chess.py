@@ -59,6 +59,12 @@ controller.connect()
 
 # Main control loop
 try:
+    # Home printer
+    controller.send_gcode(["G28"])
+    print("Homing printer...")
+    time.sleep(5)  # Wait for homing to complete
+    print("Printer homed.")
+
     while True:
         # Simulate receiving a move (you could replace this with input from a chess engine or user input)
         move = input("Enter a move in the format 'e2 e4' (or type 'quit' to exit): ")
