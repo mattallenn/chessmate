@@ -10,29 +10,39 @@ def wait_for_response():
         response = ser.readline().decode('utf-8').strip()
         print(f"Printer response: {response}")
         
-        # Check if the SD card initialization failed, but continue if 'ok' is received
+        # Continue on certain non-critical responses
         if 'TF init fail' in response:
-            print("SD card initialization failed, but proceeding with USB communication.")
-        if response == 'ok' or 'start' in response.lower():
-            break
+            print("SD card initialization failed. Continuing with USB commands.")
+        elif 'start' in response.lower():
+            print("Printer initialized.")
+            return True
+        elif 'ok' in response.lower():
+            return True
+        
+        # Catch unexpected responses or errors
+        elif not response:
+            print("No response, retrying...")
+            time.sleep(1)  # Retry after a short delay
+        else:
+            print(f"Unexpected response: {response}")
 
 # Send command and wait for 'ok' response
 def send_gcode(command):
     ser.write(f"{command}\n".encode())
     print(f"Sent: {command}")
-    wait_for_response()
+    if wait_for_response():
+        print(f"G-code {command} executed successfully")
 
 # Initialize connection with the printer
 def initialize_printer():
     # Wait for the printer to send 'start' after powering up
     print("Waiting for printer to initialize...")
-    wait_for_response()
+    if wait_for_response():
+        # Send M110 to set the line number (handshake)
+        send_gcode('M110 N0')
 
-    # Send M110 to set the line number (handshake)
-    send_gcode('M110 N0')
-
-    # Optionally, send M105 to request temperature report (another handshake)
-    send_gcode('M105')
+        # Optionally, send M105 to request temperature report (another handshake)
+        send_gcode('M105')
 
 # Example function to move the printer
 def move_printer():
