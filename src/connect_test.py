@@ -9,6 +9,10 @@ def wait_for_response():
     while True:
         response = ser.readline().decode('utf-8').strip()
         print(f"Printer response: {response}")
+        
+        # Check if the SD card initialization failed, but continue if 'ok' is received
+        if 'TF init fail' in response:
+            print("SD card initialization failed, but proceeding with USB communication.")
         if response == 'ok' or 'start' in response.lower():
             break
 
